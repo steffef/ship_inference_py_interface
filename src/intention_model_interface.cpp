@@ -1,13 +1,12 @@
-//#include "intention_model_interface.h"
 #include <pybind11/pybind11.h>
-// #include "Eigen/Dense"
 #include "intention_model.h"
 #include "parameters.h"
+#include <Eigen/Dense>
 
 namespace py = pybind11;
 namespace INTENTION_INFERENCE
 {
-  PYBIND11_MODULE(intention_model, m) {
+  PYBIND11_MODULE(intention_model_interface, m) {
     m.doc() = "optional module docstring";
     py::class_<IntentionModelParameters>(m, "IntentionModelParameters");
 
