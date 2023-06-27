@@ -26,6 +26,44 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# C++
+# # Compiled object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+
+# Build directories
+build/
+bin/
+
+# Dependency directories
+lib/
+vendor/
+
+# IDE-specific files and directories
+.vscode/
+.idea/
+*.suo
+*.ncb
+*.sdf
+
+# Generated files
+Makefile
+CMakeLists.txt.user
+compile_commands.json
+
+# Log files
+*.log
+
+# macOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

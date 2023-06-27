@@ -1,0 +1,7 @@
+[submodule "ship_intention_inference"]
+	path = ship_intention_inference
+	url = git@github.com:sverrevr/ship_intention_inference.git
+	branch = startpoint
+[submodule "deps/pybind11"]
+	path = deps/pybind11
+	url = git@github.com:pybind/pybind11.git
