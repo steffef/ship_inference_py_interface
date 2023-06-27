@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
-
-project(MyProject)
+cmake_minimum_required(VERSION 3.12)
+project(IntentionModelInterface LANGUAGES CXX)
 
 # Add your source files
 set(SOURCES
@@ -12,11 +11,8 @@ set(HEADERS
     ship_intention_inference/intention_model.h
 )
 
-# Set the executable name and link the source files
-add_executable(intention_model_interface ${SOURCES} ${HEADERS})
+# Add the directory containing header files
+include_directories(ship_intention_inference)
 
-# Set include directories
-add_subdirectory(deps/pybind11)
-target_link_libraries(intention_model_interface PRIVATE pybind11::module)
-target_include_directories(intention_model_interface PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/deps/pybind11/include ${CMAKE_CURRENT_SOURCE_DIR}/ship_intention_inference)
-target_include_directories(intention_model_interface PRIVATE include)
+find_package(pybind11 CONFIG REQUIRED)
+pybind11_add_module(intention_model_interface ${SOURCES} ${HEADERS})
