@@ -4,32 +4,52 @@
 #include "parameters.h"
 
 namespace py = pybind11;
-namespace INTENTION_INFERENCE
-{
+
+namespace INTENTION_INFERENCE {
     PYBIND11_MODULE(IntentionModelInterface, m) {
         m.doc() = "optional module docstring";
 
+        py::class_<decltype(IntentionModelParameters::expanding_dbn)>(m, "expanding_dbn")
+            .def(py::init<>())
+            .def_readwrite("min_time_s",
+                           &decltype(IntentionModelParameters::expanding_dbn)::min_time_s)
+            .def_readwrite("max_time_s",
+                           &decltype(IntentionModelParameters::expanding_dbn)::max_time_s)
+            .def_readwrite("min_course_change_rad",
+                           &decltype(IntentionModelParameters::expanding_dbn)::min_course_change_rad)
+            .def_readwrite("min_speed_change_m_s",
+                           &decltype(IntentionModelParameters::expanding_dbn)::min_speed_change_m_s);
 
+        py::class_<decltype(IntentionModelParameters::ample_time_s)>(m, "ample_time_s")
+            .def(py::init<>())
+            .def_readwrite("mu",
+                           &decltype(IntentionModelParameters::ample_time_s)::mu)
+            .def_readwrite("sigma",
+                           &decltype(IntentionModelParameters::ample_time_s)::sigma)
+            .def_readwrite("max",
+                           &decltype(IntentionModelParameters::ample_time_s)::max)
+            .def_readwrite("n_bins",
+                           &decltype(IntentionModelParameters::ample_time_s)::n_bins)
+            .def_readwrite("minimal_accepted_by_ownship",
+                           &decltype(IntentionModelParameters::ample_time_s)::minimal_accepted_by_ownship);
 
         py::class_<IntentionModelParameters>(m, "IntentionModelParameters")
             .def(py::init<>())
             .def_readwrite("number_of_network_evaluation_samples",
-                &IntentionModelParameters::number_of_network_evaluation_samples)
+                           &IntentionModelParameters::number_of_network_evaluation_samples)
             .def_readwrite("max_number_of_obstacles",
-                &IntentionModelParameters::max_number_of_obstacles)
+                           &IntentionModelParameters::max_number_of_obstacles)
             .def_readwrite("time_into_trajectory",
-                &IntentionModelParameters::time_into_trajectory)
+                           &IntentionModelParameters::time_into_trajectory)
             .def_readwrite("starting_distance",
-                &IntentionModelParameters::starting_distance)
+                           &IntentionModelParameters::starting_distance)
             .def_readwrite("starting_cpa_distance",
-                &IntentionModelParameters::starting_cpa_distance);
-        // struct{
-//             double min_time_s;
-//             double max_time_s;
-//             double min_course_change_rad;
-//             double min_speed_change_m_s;
-//         } expanding_dbn;
-//         struct{
+                           &IntentionModelParameters::starting_cpa_distance)
+            .def_readwrite("expanding_dbn",
+                           &IntentionModelParameters::expanding_dbn)
+            .def_readwrite("ample_time_s",
+                           &IntentionModelParameters::ample_time_s);
+ //         struct{
 //             double mu;
 //             double sigma;
 //             double max;
@@ -91,8 +111,8 @@ namespace INTENTION_INFERENCE
 // }
 
     // py::class_<IntentionModel>(m, "IntentionModel")
-        //   .def(py::init<std::string, const IntentionModelParameters&, int,
-        //        const std::map<int, Eigen::Vector4d>&,
+    //       .def(py::init<std::string, const IntentionModelParameters&, int,
+    //            const std::map<int, Eigen::Vector4d>&,
     //        const std::map<std::string, std::string>&>())
     //   .def("insertObservation", &IntentionModel::insertObservation)
     //   .def("insertObservationRelativeSituation",
