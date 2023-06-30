@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h> //For binding maps to dicts
-//#include <pybind11/stl.h>
+#include <pybind11/stl.h>
 //#include <pybind11/embed.h>
 #include <pybind11/eigen.h>
 #include "intention_model.h"
