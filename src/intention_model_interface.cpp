@@ -8,7 +8,7 @@
 namespace py = pybind11;
 
 namespace INTENTION_INFERENCE {
-    PYBIND11_MODULE(IntentionModelInterface, m) {
+    PYBIND11_MODULE(intention_model, m) {
         m.doc() = "optional module docstring";
 
     py::class_<IntentionModel>(m, "IntentionModel")

@@ -1,6 +1,6 @@
 import sys
 sys.path.append("build/")
-import IntentionModelParametersInterface as imp
+import parameters
 
 def printModelParameters(param):
     print("number_of_network_evaluation_samples", param.number_of_network_evaluation_samples)
@@ -56,7 +56,7 @@ def printModelParameters(param):
     print("priority_probability higher", param.priority_probability["higher"])
 
 def setModelParameters(num_ships):
-    param = imp.IntentionModelParameters()
+    param = parameters.IntentionModelParameters()
     param.number_of_network_evaluation_samples = 100000
     param.max_number_of_obstacles = num_ships-1 #must be set to num_ships-1 or else segmantation fault
     param.time_into_trajectory = 10

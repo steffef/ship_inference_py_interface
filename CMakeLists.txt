@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(SOURCES
     src/intention_model_interface.cpp
     src/intention_model_parameters_interface.cpp
+    src/intention_model_geometry_interface.cpp
 )
 
 set(HEADERS
@@ -21,21 +22,28 @@ find_package(Python 3.11 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-# Add the IntentionModelInterface module
-pybind11_add_module(IntentionModelInterface ${SOURCES} ${HEADERS})
-target_link_libraries(IntentionModelInterface PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
-target_include_directories(IntentionModelInterface PRIVATE ${PYBIND11_INCLUDE_DIRS})
+# Add the intention_model module
+pybind11_add_module(intention_model ${SOURCES} ${HEADERS})
+target_link_libraries(intention_model PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
+target_include_directories(intention_model PRIVATE ${PYBIND11_INCLUDE_DIRS})
 
-# Add the IntentionModelParametersInterface module
-pybind11_add_module(IntentionModelParametersInterface src/intention_model_parameters_interface.cpp)
-target_link_libraries(IntentionModelParametersInterface PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
-target_include_directories(IntentionModelParametersInterface PRIVATE ${PYBIND11_INCLUDE_DIRS})
+# Add the parameters module
+pybind11_add_module(parameters src/intention_model_parameters_interface.cpp)
+target_link_libraries(parameters PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
+target_include_directories(parameters PRIVATE ${PYBIND11_INCLUDE_DIRS})
+
+# Add the geometry module
+pybind11_add_module(geometry src/intention_model_parameters_interface.cpp)
+target_link_libraries(geometry PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
+target_include_directories(geometry PRIVATE ${PYBIND11_INCLUDE_DIRS})
 
 # Set the appropriate extension for the module files based on the platform
 if(WIN32)
-    set_target_properties(IntentionModelInterface PROPERTIES SUFFIX ".pyd")
-    set_target_properties(IntentionModelParametersInterface PROPERTIES SUFFIX ".pyd")
+    set_target_properties(intention_model PROPERTIES SUFFIX ".pyd")
+    set_target_properties(parameters PROPERTIES SUFFIX ".pyd")
+    set_target_properties(geometry PROPERTIES SUFFIX ".pyd")
 else()
-    set_target_properties(IntentionModelInterface PROPERTIES PREFIX "")
-    set_target_properties(IntentionModelParametersInterface PROPERTIES PREFIX "")
+    set_target_properties(intention_model PROPERTIES PREFIX "")
+    set_target_properties(parameters PROPERTIES PREFIX "")
+    set_target_properties(geometry PROPERTIES PREFIX "")
 endif()

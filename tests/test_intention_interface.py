@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import sys
 sys.path.append("build/")
-import IntentionModelInterface as im
+import intention_model as im
+import geometry as geom
 import test_parameters_interface as param
 
 import numpy as np
@@ -88,17 +89,17 @@ if __name__ == "__main__":
 
     while not inserted:
         for i in range(num_ships):
-            # print(ship_state[timestep][ship_list[1]]["PX"] - ship_state[timestep][ship_list[2]]["PX"])
-            # dist = evaluateDistance(ship_state[timestep][ship_list[1]]["PX"] - ship_state[timestep][ship_list[2]]["PX"], ship_state[timestep][ship_list[1]]["PY"] - ship_state[timestep][ship_list[2]]["PY"])
-            # print("dist:", dist)
-            # CPA = evaluateCPA(ship_state[timestep][ship_list[1]], ship_state[timestep][ship_list[2]])
-            # print("CPA dist:", CPA["distance_at_CPA"])
-            # if dist < parameters.starting_distance and sog_vec[timestep] > 0.1 and sog_vec[len(unique_time_vec) + timestep] > 0.1 and timestep > 0:  # and CPA["distance_at_CPA"] < parameters.starting_cpa_distance: #only checks the speed for two ships
+            print(ship_state[timestep][ship_list[1]]["PX"] - ship_state[timestep][ship_list[2]]["PX"])
+            dist = geom.evaluateDistance(ship_state[timestep][ship_list[1]]["PX"] - ship_state[timestep][ship_list[2]]["PX"], ship_state[timestep][ship_list[1]]["PY"] - ship_state[timestep][ship_list[2]]["PY"])
+            print("dist:", dist)
+            CPA = geom.evaluateCPA(ship_state[timestep][ship_list[1]], ship_state[timestep][ship_list[2]])
+            print("CPA dist:", CPA["distance_at_CPA"])
             print("intentionModelFilename", intentionModelFilename)
             print("parameters", parameters)
             print("ship_list[i]", ship_list[i])
             print("ship_state[timestep]", ship_state[timestep])
-            ship_intentions[ship_list[i]] = im.IntentionModel(intentionModelFilename, parameters, ship_list[i], ship_state[timestep])
+            if dist < parameters.starting_distance and sog_vec[timestep] > 0.1 and sog_vec[len(unique_time_vec) + timestep] > 0.1 and timestep > 0:  # and CPA["distance_at_CPA"] < parameters.starting_cpa_distance: #only checks the speed for two ships
+                ship_intentions[ship_list[i]] = im.IntentionModel(intentionModelFilename, parameters, ship_list[i], ship_state[timestep])
             inserted = True
         timestep += 1
 
