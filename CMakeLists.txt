@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Add your source files
 set(SOURCES
     src/intention_model_interface.cpp
+    src/intention_model_parameters_interface.cpp
 )
 
 set(HEADERS
@@ -20,15 +21,21 @@ find_package(Python 3.11 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-# Add the module
-pybind11_add_module(${PROJECT_NAME} ${SOURCES})
+# Add the IntentionModelInterface module
+pybind11_add_module(IntentionModelInterface ${SOURCES} ${HEADERS})
+target_link_libraries(IntentionModelInterface PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
+target_include_directories(IntentionModelInterface PRIVATE ${PYBIND11_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
-target_include_directories(${PROJECT_NAME} PRIVATE ${PYBIND11_INCLUDE_DIRS})
+# Add the IntentionModelParametersInterface module
+pybind11_add_module(IntentionModelParametersInterface src/intention_model_parameters_interface.cpp)
+target_link_libraries(IntentionModelParametersInterface PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
+target_include_directories(IntentionModelParametersInterface PRIVATE ${PYBIND11_INCLUDE_DIRS})
 
-# Set the appropriate extension for the module file based on the platform
+# Set the appropriate extension for the module files based on the platform
 if(WIN32)
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".pyd")
+    set_target_properties(IntentionModelInterface PROPERTIES SUFFIX ".pyd")
+    set_target_properties(IntentionModelParametersInterface PROPERTIES SUFFIX ".pyd")
 else()
-    set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+    set_target_properties(IntentionModelInterface PROPERTIES PREFIX "")
+    set_target_properties(IntentionModelParametersInterface PROPERTIES PREFIX "")
 endif()
