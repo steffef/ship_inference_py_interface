@@ -1,0 +1,4 @@
+[submodule "ship_intention_inference"]
+	path = ship_intention_inference
+	url = git@github.com:NTNU-Autoship-Internal/ship_intention_inference.git
+	branch = cleanup_and_fixes

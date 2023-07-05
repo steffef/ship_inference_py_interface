@@ -7,9 +7,8 @@ import test_parameters_interface as param
 
 import numpy as np
 import datetime
-from typing import Dict, List
 
-def readFileToVecs(filename: str, mmsi_vec: List[int], time_vec: List[float], x_vec: List[float], y_vec: List[float], sog_vec: List[float], cog_vec: List[float]):
+def readFileToVecs(filename: str, mmsi_vec: list[int], time_vec: list[float], x_vec: list[float], y_vec: list[float], sog_vec: list[float], cog_vec: list[float]):
     filename_open = "ship_intention_inference/files/" + filename
 
     with open(filename_open, 'r') as file:
@@ -47,7 +46,7 @@ def readFileToVecs(filename: str, mmsi_vec: List[int], time_vec: List[float], x_
         else:
             print("Could not open file")
 
-def vecsToShipStateVectorMap(ship_state: List[Dict[int, np.ndarray]], unique_time_vec: List[float], num_ships: int, mmsi_vec: List[int], time_vec: List[float], x_vec: List[float], y_vec: List[float], sog_vec: List[float], cog_vec: List[float]):
+def vecsToShipStateVectorMap(ship_state: list[dict[int, np.ndarray]], unique_time_vec: list[float], num_ships: int, mmsi_vec: list[int], time_vec: list[float], x_vec: list[float], y_vec: list[float], sog_vec: list[float], cog_vec: list[float]):
     for i in range(len(time_vec)//num_ships):
         current_ship_states = {}
         for c in range(num_ships):
@@ -57,12 +56,12 @@ def vecsToShipStateVectorMap(ship_state: List[Dict[int, np.ndarray]], unique_tim
         ship_state.append(current_ship_states)
         unique_time_vec.append(time_vec[i])
 
-def getShipList(mmsi_vec: List[int]) -> List[int]:
+def getShiplist(mmsi_vec: list[int]) -> list[int]:
     ship_list = list(set(mmsi_vec))
     return ship_list
 
 
-def getShipListIndex(mmsi, ship_list):
+def getShiplistIndex(mmsi, ship_list):
     index = -1
     for i in range(len(ship_list)):
         if mmsi == ship_list[i]:
@@ -73,8 +72,12 @@ def getShipListIndex(mmsi, ship_list):
     return index
 
 def writeIntentionToFile(timestep, parameters, filename, ship_intentions, ship_state, ship_list, unique_time_vec, x_vec, y_vec):
-    intentionFile = open("ship_intention_inference/intention_files/nostart_intention_" + filename, "w")
-    intentionFile.write("mmsi,x,y,time,colreg_compliant,good_seamanship,unmodeled_behaviour,has_turned_portwards,has_turned_starboardwards,change_in_speed,is_changing_course,CR_PS,CR_SS,HO,OT_en,OT_ing,priority_lower,priority_similar,priority_higher,risk_of_collision,current_risk_of_collision,start")
+
+    filename_intention = "intention_files/nostart_intention_" + filename
+    with open(filename_intention, 'w') as intentionFile:
+        intentionFile.write("mmsi,x,y,time,colreg_compliant,good_seamanship,unmodeled_behaviour,has_turned_portwards,has_turned_starboardwards,change_in_speed,is_changing_course,CR_PS,CR_SS,HO,OT_en,OT_ing,priority_lower,priority_similar,priority_higher,risk_of_collision,current_risk_of_collision,start\n")
+        # intentionFile.write("mmsi,x,y,time,colreg_compliant,good_seamanship,unmodeled_behaviour,CR_PS,CR_SS,HO,OT_en,OT_ing,priority_lower,priority_similar,priority_higher\n")
+        # intentionFile.write("mmsi,x,y,time,CR_PS,CR_SS,HO,OT_en,OT_ing\n")
 
     risk_of_collision = {}
     current_risk = {}
@@ -98,7 +101,7 @@ def writeIntentionToFile(timestep, parameters, filename, ship_intentions, ship_s
 
         for ship_id, current_ship_intention_model in ship_intentions.items():
             print("ship_id:", ship_id)
-            j = getShipListIndex(ship_id, ship_list)
+            j = getShiplistIndex(ship_id, ship_list)
             current_ship_intention_model.insertObservation(parameters \
                                                            ,start\
                                                            , new_timestep \
@@ -115,11 +118,10 @@ def writeIntentionToFile(timestep, parameters, filename, ship_intentions, ship_s
                                                            , unique_time_vec[i] \
                                                            , x_vec[len(unique_time_vec) * j + i] \
                                                            , y_vec[len(unique_time_vec) * j + i] \
-                                                           , intentionFile\
+                                                           , filename\
                                                            )
             new_timestep = False
 
-    intentionFile.close()
     print("Finished writing intentions to file")
 
 if __name__ == "__main__":
@@ -135,12 +137,12 @@ if __name__ == "__main__":
     sog_vec = []
     cog_vec = []
     unique_time_vec = []
-    ship_state: List[Dict[int, np.ndarray]] = []
+    ship_state: list[dict[int, np.ndarray]] = []
 
     readFileToVecs(filename, mmsi_vec, time_vec, x_vec, y_vec, sog_vec, cog_vec)
     vecsToShipStateVectorMap(ship_state, unique_time_vec, num_ships, mmsi_vec,\
                              time_vec, x_vec, y_vec, sog_vec, cog_vec)
-    ship_list = getShipList(mmsi_vec)
+    ship_list = getShiplist(mmsi_vec)
 
     parameters = param.setModelParameters(num_ships)
     ship_intentions = {}
@@ -156,7 +158,11 @@ if __name__ == "__main__":
             print("dist:", dist)
             CPA = geom.evaluateCPA(ship_state[timestep][ship_list[1]], ship_state[timestep][ship_list[0]])
             print("CPA dist:", CPA.distance_at_CPA)
-            if dist < parameters.starting_distance and sog_vec[timestep] > 0.1 and sog_vec[len(unique_time_vec) + timestep] > 0.1 and timestep > 0:  # and CPA["distance_at_CPA"] < parameters.starting_cpa_distance: #only checks the speed for two ships
+            if (dist < parameters.starting_distance) \
+               and (sog_vec[timestep] > 0.1)\
+               and (sog_vec[len(unique_time_vec) + timestep] > 0.1)\
+               and (timestep > 0):  # and CPA["distance_at_CPA"] < parameters.starting_cpa_distance: #only checks the speed for two ships
+
                 ship_intentions[ship_list[i]] = im.IntentionModel(intentionModelFilename, parameters, ship_list[i], ship_state[timestep])
                 inserted = True
         timestep += 1
