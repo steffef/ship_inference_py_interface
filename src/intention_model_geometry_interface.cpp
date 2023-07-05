@@ -11,6 +11,14 @@ namespace INTENTION_INFERENCE {
     PYBIND11_MODULE(geometry, m) {
         m.doc() = "optional module docstring";
 
+        m.attr("PX") = 0;
+        m.attr("PY") = 1;
+        m.attr("CHI") = 2;
+        m.attr("U") = 3;
+
+        m.attr("DEG2RAD") = M_PI / 180.0f;
+        m.attr("RAD2DEG") = 180.0f / M_PI;
+
         py::class_<CPA>(m, "CPA")
             .def(py::init<>())
             .def_readwrite("bearing_relative_to_heading",

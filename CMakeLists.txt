@@ -30,10 +30,11 @@ target_include_directories(intention_model PRIVATE ${PYBIND11_INCLUDE_DIRS})
 # Add the parameters module
 pybind11_add_module(parameters src/intention_model_parameters_interface.cpp)
 target_link_libraries(parameters PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
+
 target_include_directories(parameters PRIVATE ${PYBIND11_INCLUDE_DIRS})
 
 # Add the geometry module
-pybind11_add_module(geometry src/intention_model_parameters_interface.cpp)
+pybind11_add_module(geometry src/intention_model_geometry_interface.cpp)
 target_link_libraries(geometry PRIVATE pybind11::module Eigen3::Eigen ${CMAKE_SOURCE_DIR}/ship_intention_inference/smile/libsmile.a)
 target_include_directories(geometry PRIVATE ${PYBIND11_INCLUDE_DIRS})
 

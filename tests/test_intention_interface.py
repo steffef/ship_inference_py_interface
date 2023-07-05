@@ -61,9 +61,70 @@ def getShipList(mmsi_vec: List[int]) -> List[int]:
     ship_list = list(set(mmsi_vec))
     return ship_list
 
+
+def getShipListIndex(mmsi, ship_list):
+    index = -1
+    for i in range(len(ship_list)):
+        if mmsi == ship_list[i]:
+            index = i
+            break
+    if index == -1:
+        print("ERROR: mmsi not found in ship list")
+    return index
+
+def writeIntentionToFile(timestep, parameters, filename, ship_intentions, ship_state, ship_list, unique_time_vec, x_vec, y_vec):
+    intentionFile = open("ship_intention_inference/intention_files/nostart_intention_" + filename, "w")
+    intentionFile.write("mmsi,x,y,time,colreg_compliant,good_seamanship,unmodeled_behaviour,has_turned_portwards,has_turned_starboardwards,change_in_speed,is_changing_course,CR_PS,CR_SS,HO,OT_en,OT_ing,priority_lower,priority_similar,priority_higher,risk_of_collision,current_risk_of_collision,start")
+
+    risk_of_collision = {}
+    current_risk = {}
+    new_initial_ship_states = {}
+    last_ship_states = {}
+    check_changing_course = {}
+
+    for ship_id in ship_list:
+        risk_of_collision[ship_id] = False
+        current_risk[ship_id] = False
+        new_initial_ship_states[ship_id] = ship_state[timestep][ship_id]
+        last_ship_states[ship_id] = new_initial_ship_states[ship_id]
+
+    old_ship_states = {}
+    start = False
+    new_timestep = False
+
+    for i in range(timestep, len(unique_time_vec)):
+        print("timestep:", i)
+        new_timestep = True
+
+        for ship_id, current_ship_intention_model in ship_intentions.items():
+            print("ship_id:", ship_id)
+            j = getShipListIndex(ship_id, ship_list)
+            current_ship_intention_model.insertObservation(parameters \
+                                                           ,start\
+                                                           , new_timestep \
+                                                           , check_changing_course \
+                                                           , current_risk \
+                                                           , new_initial_ship_states \
+                                                           , risk_of_collision \
+                                                           , ship_state[i] \
+                                                           , ship_state \
+                                                           , ship_state[i - 1] \
+                                                           , old_ship_states \
+                                                           , ship_list \
+                                                           , False \
+                                                           , unique_time_vec[i] \
+                                                           , x_vec[len(unique_time_vec) * j + i] \
+                                                           , y_vec[len(unique_time_vec) * j + i] \
+                                                           , intentionFile\
+                                                           )
+            new_timestep = False
+
+    intentionFile.close()
+    print("Finished writing intentions to file")
+
 if __name__ == "__main__":
     num_ships = 2
-    filename = "new_1_Case - 09-17-2018, 18-24-32 - 0URFX-60-sec.csv"
+    filename = "new_1_Case - 08-09-2018, 19-12-24 - 4XJ3B-60-sec.csv"
     intentionModelFilename = "ship_intention_inference/intention_model_with_risk_of_collision_no_startpoint_3.xdsl"
 
     ship_state = []
@@ -89,18 +150,22 @@ if __name__ == "__main__":
 
     while not inserted:
         for i in range(num_ships):
-            print(ship_state[timestep][ship_list[1]]["PX"] - ship_state[timestep][ship_list[2]]["PX"])
-            dist = geom.evaluateDistance(ship_state[timestep][ship_list[1]]["PX"] - ship_state[timestep][ship_list[2]]["PX"], ship_state[timestep][ship_list[1]]["PY"] - ship_state[timestep][ship_list[2]]["PY"])
+            print(ship_state[timestep][ship_list[1]][geom.PX] - ship_state[timestep][ship_list[0]][geom.PX])
+            dist = geom.evaluateDistance(ship_state[timestep][ship_list[1]][geom.PX] - ship_state[timestep][ship_list[0]][geom.PX],\
+                                         ship_state[timestep][ship_list[1]][geom.PY] - ship_state[timestep][ship_list[0]][geom.PY])
             print("dist:", dist)
-            CPA = geom.evaluateCPA(ship_state[timestep][ship_list[1]], ship_state[timestep][ship_list[2]])
-            print("CPA dist:", CPA["distance_at_CPA"])
-            print("intentionModelFilename", intentionModelFilename)
-            print("parameters", parameters)
-            print("ship_list[i]", ship_list[i])
-            print("ship_state[timestep]", ship_state[timestep])
+            CPA = geom.evaluateCPA(ship_state[timestep][ship_list[1]], ship_state[timestep][ship_list[0]])
+            print("CPA dist:", CPA.distance_at_CPA)
             if dist < parameters.starting_distance and sog_vec[timestep] > 0.1 and sog_vec[len(unique_time_vec) + timestep] > 0.1 and timestep > 0:  # and CPA["distance_at_CPA"] < parameters.starting_cpa_distance: #only checks the speed for two ships
                 ship_intentions[ship_list[i]] = im.IntentionModel(intentionModelFilename, parameters, ship_list[i], ship_state[timestep])
-            inserted = True
+                inserted = True
         timestep += 1
+
+    writeIntentionToFile(timestep, parameters,filename, ship_intentions, ship_state, ship_list, unique_time_vec, x_vec,y_vec); #intentionfile is called: intention_<filename>  NB: not all intentions!
+
+    for i in range(5):
+        for key, item in ship_state[i].items():
+            print(key, "->", item)
+            print("time:", unique_time_vec[i])
 
     print("done")
