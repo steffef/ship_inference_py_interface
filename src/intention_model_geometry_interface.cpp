@@ -1,7 +1,5 @@
 #include <pybind11/pybind11.h>
-//#include <pybind11/stl_bind.h> //For binding maps to dicts
 #include <pybind11/stl.h>
-//#include <pybind11/embed.h>
 #include <pybind11/eigen.h>
 #include "geometry.h"
 
@@ -9,7 +7,7 @@ namespace py = pybind11;
 
 namespace INTENTION_INFERENCE {
     PYBIND11_MODULE(geometry, m) {
-        m.doc() = "optional module docstring";
+        m.doc() = "Functions for calculating distances between ships. This module has only partially been implemented in pybind11";
 
         m.attr("PX") = 0;
         m.attr("PY") = 1;

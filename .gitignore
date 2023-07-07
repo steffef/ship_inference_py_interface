@@ -1,3 +1,7 @@
+# Generated files
+intention_model_from_code.xdsl
+intention_files/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

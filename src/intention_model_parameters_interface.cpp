@@ -8,7 +8,7 @@ PYBIND11_MAKE_OPAQUE(std::map<std::string, double>)
 
 namespace INTENTION_INFERENCE {
     PYBIND11_MODULE(parameters, m) {
-        m.doc() = "optional module docstring";
+        m.doc() = "Parameters for intention model";
 
         py::class_<decltype(IntentionModelParameters::expanding_dbn)>(m, "expanding_dbn")
             .def(py::init<>())
